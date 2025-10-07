@@ -1,10 +1,10 @@
+import { TableName } from "../config/table_names";
 import { Pool } from "pg";
-import Database from "../validation/database";
-import { TablesNames } from "../types/tables_names";
+import Database from "../core/database";
 
 export default abstract class Repository<DTO extends Object, Entity extends object> {
   protected pool: Pool;
-  protected abstract tableName: TablesNames;
+  protected abstract tableName: TableName;
   protected fromRow = (row: Entity): Entity => row;
 
   constructor() {
