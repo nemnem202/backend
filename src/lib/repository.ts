@@ -1,4 +1,4 @@
-import { TableName } from "../config/table_names";
+import { TableName } from "../types/general/table_names";
 import { Pool } from "pg";
 import Database from "../core/database";
 
