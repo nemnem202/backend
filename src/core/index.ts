@@ -1,4 +1,5 @@
 import express from "express";
+import { CloudinaryClient } from "./CloudinaryClient";
 import { AccountRepository } from "../repository/account";
 
 const app = express();
