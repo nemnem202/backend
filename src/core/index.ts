@@ -9,3 +9,6 @@ app.use(router);
 app.listen(port, () => {
   console.log(`Serveur en écoute sur http://localhost:${port}`);
 });
+
+
+CloudinaryClient.getInstance().uploadImage('./test-image.png');
