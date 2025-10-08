@@ -1,4 +1,5 @@
 import express from "express";
+import { CloudinaryClient } from "./CloudinaryClient";
 
 const app = express();
 const port = 3000;
