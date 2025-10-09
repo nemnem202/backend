@@ -30,4 +30,3 @@ app.listen(port, () => {
 });
 
 
-CloudinaryClient.getInstance().uploadImage('./test-image.png');
