@@ -1,0 +1,11 @@
+### tests pour la route account
+GET http://localhost:3000/account/account
+
+
+### tests pour la route product
+
+GET http://localhost:3000/product/50s
+
+### tests pour la route market
+
+GET http://localhost:3000/market
