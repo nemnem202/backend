@@ -22,7 +22,7 @@ export class MarketController {
   static async createProduct(req: Request, res: Response<ServerResponse>) {
 
     try {
-
+      console.log(req.body);
       const postedProduct: ProductDTO = {
         account_id: req.body.account_id,
         available_quantity: req.body.available_quantity,
@@ -31,16 +31,21 @@ export class MarketController {
         product_description: req.body.product_description,
         product_image_path: req.body.product_image_path,
         product_name: req.body.product_name,
-        product_price: req.body.product_price,
+        product_price: parseInt(req.body.product_price),
         suspended: false,
       }
-
-      const validation = ZodSchema.product.safeParse(postedProduct)
-      const product = await this.productRepository.add_item(postedProduct)
+      console.log(postedProduct)
+      const validation = ZodSchema.product.parse(postedProduct)
+      //const product = await this.productRepository.add_item(postedProduct)
     } 
     catch(result){
       if(result instanceof ZodError){
-        console.log(result.issues);
+        result.issues.forEach((issue) => {
+          console.error(issue);
+        })
+      }
+      else{
+        console.error(result);
       }
     }
   }
