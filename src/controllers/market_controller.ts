@@ -35,8 +35,10 @@ export class MarketController {
         suspended: false,
       }
       console.log(postedProduct)
+      console.log(req.file);
       const validation = ZodSchema.product.parse(postedProduct)
       //const product = await this.productRepository.add_item(postedProduct)
+      res.status(200);
     } 
     catch(result){
       if(result instanceof ZodError){
@@ -47,6 +49,7 @@ export class MarketController {
       else{
         console.error(result);
       }
+      res.status(400);
     }
   }
 
