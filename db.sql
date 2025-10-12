@@ -1,3 +1,13 @@
+SELECT current_database(), current_user;
+
+CREATE TABLE administrator(
+   id SERIAL PRIMARY KEY,
+   username VARCHAR(100)  NOT NULL UNIQUE,
+   password VARCHAR(500)  NOT NULL
+);
+
+
+
 CREATE TABLE category(
    id SERIAL PRIMARY KEY,
    category_name VARCHAR(100)  NOT NULL
@@ -7,16 +17,10 @@ CREATE TABLE account(
    id SERIAL PRIMARY KEY,
    suspended BOOLEAN,
    is_modo BOOLEAN,
-   username VARCHAR(100)  NOT NULL,
+   username VARCHAR(100)  NOT NULL UNIQUE,
    password VARCHAR(500)  NOT NULL,
    is_vendor BOOLEAN,
    number_of_reports INTEGER NOT NULL
-);
-
-CREATE TABLE administrator(
-   id SERIAL PRIMARY KEY,
-   username VARCHAR(100)  NOT NULL,
-   password VARCHAR(500)  NOT NULL
 );
 
 CREATE TABLE product(
@@ -57,3 +61,4 @@ CREATE TABLE order_contain_product(
    FOREIGN KEY(product_id) REFERENCES product(id),
    FOREIGN KEY(order_id) REFERENCES customer_order(id)
 );
+
