@@ -4,6 +4,7 @@ import cors from "cors";
 import cookie_parser from "cookie-parser";
 import dotenv from "dotenv";
 import AdminAccountRepository from "../repository/admin_account";
+import { PasswordHandler } from "../lib/password_handler";
 
 const start_server = async () => {
   try {
@@ -28,17 +29,25 @@ const start_server = async () => {
       throw new Error("[ENV] : les clés admin de l'environnement ne sont pas définies");
     }
 
-    const admin_already_here = admin.finOneBy("username", process.env.ADMIN_USERNAME);
+    const admin_already_here = await admin.finOneBy("username", process.env.ADMIN_USERNAME);
 
     if (!admin_already_here) {
+      console.log("[LAUNCH] : création du compte administrateur", +process.env.ADMIN_USERNAME);
+      const hash = await PasswordHandler.generate_hash(process.env.ADMIN_PASSWORD);
+      if (!hash) {
+        throw new Error();
+      }
+
       const adminentity = await admin.add_item({
         username: process.env.ADMIN_USERNAME,
-        password: process.env.ADMIN_PASSWORD,
+        password: hash,
       });
 
       if (!adminentity) {
         throw new Error("l'entité n'a pas pu etre placée dans la bdd");
       }
+    } else {
+      console.warn("[LAUNCH] : compte administrateur déja créé");
     }
 
     app.listen(port, () => {

@@ -7,6 +7,7 @@ import AdminAccountRepository from "../repository/admin_account";
 import { AccountRepository } from "../repository/account";
 import { ZodError } from "zod";
 import { ZodSchema } from "../lib/zod_schemas";
+import { PasswordHandler } from "../lib/password_handler";
 
 dotenv.config();
 
@@ -28,9 +29,15 @@ export class AccountController {
 
       ZodSchema.user.parse({ username, password });
 
+      const hashed_password = await PasswordHandler.generate_hash(password);
+
+      if (!hashed_password) {
+        throw new Error();
+      }
+
       const new_user: AccountDTO = {
         number_of_reports: 0,
-        password,
+        password: hashed_password,
         username,
         is_modo: false,
         is_vendor: false,
@@ -62,11 +69,13 @@ export class AccountController {
 
     const admin = await this.adminrepo.finOneBy("username", username);
 
-    if (admin && admin.password === password) return AccountController.handleAdminLogin(admin, res);
+    if (admin && (await PasswordHandler.chech_validity(password, admin.password)) === true)
+      return AccountController.handleAdminLogin(admin, res);
 
     const user = await this.userRepo.finOneBy("username", username);
 
-    if (user && user.password === password) return AccountController.handleUserLogin(user, res);
+    if (user && (await PasswordHandler.chech_validity(password, user.password)) === true)
+      return AccountController.handleUserLogin(user, res);
 
     res.send({ message: "invalid username or password", success: false });
   };
