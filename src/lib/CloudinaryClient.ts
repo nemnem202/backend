@@ -25,7 +25,7 @@ export class CloudinaryClient {
     // Use the uploaded file's name as the asset's public ID and
     // allow overwriting the asset with new versions
     const options: UploadApiOptions = {
-      use_filename: true,
+      use_filename: false,
       unique_filename: false,
       overwrite: true,
     };
