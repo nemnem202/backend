@@ -7,28 +7,13 @@ export class ZodSchema {
       .max(100, { message: "Le nom de la catégorie ne peut pas dépasser 100 caractères." }),
   });
 
-  static account = z.object({
-    suspended: z
-      .boolean({ message: "Le champ 'suspended' doit être un booléen." })
-      .nullable()
-      .optional(),
-    is_modo: z
-      .boolean({ message: "Le champ 'is_modo' doit être un booléen." })
-      .nullable()
-      .optional(),
+  static user = z.object({
     username: z
       .string({ message: "Le nom d'utilisateur est requis." })
       .max(100, { message: "Le nom d'utilisateur ne peut pas dépasser 100 caractères." }),
     password: z
       .string({ message: "Le mot de passe est requis." })
       .max(500, { message: "Le mot de passe ne peut pas dépasser 500 caractères." }),
-    is_vendor: z
-      .boolean({ message: "Le champ 'is_vendor' doit être un booléen." })
-      .nullable()
-      .optional(),
-    number_of_reports: z
-      .number({ message: "Le nombre de signalements doit être un nombre." })
-      .int({ message: "Le nombre de signalements doit être un entier." }),
   });
 
   static administrator = z.object({
