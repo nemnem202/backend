@@ -64,6 +64,55 @@ export class AccountController {
     }
   };
 
+  static register_modo = async (req: Request, res: Response<ServerResponse>) => {
+    try {
+      const { username, password, invite_key } = req.body;
+
+      const user_is_already_here = await this.userRepo.finOneBy("username", username);
+
+      if (user_is_already_here)
+        res.send({
+          message: "l'utilisateur est déja enregistré",
+          success: false,
+        });
+
+      ZodSchema.user.parse({ username, password });
+
+      const hashed_password = await PasswordHandler.generate_hash(password);
+
+      if (!hashed_password) {
+        throw new Error();
+      }
+
+      const new_user: AccountDTO = {
+        number_of_reports: 0,
+        password: hashed_password,
+        username,
+        is_modo: true,
+        is_vendor: false,
+        suspended: false,
+      };
+
+      const set_user = this.userRepo.add_item(new_user);
+
+      if (!set_user) {
+        throw new Error();
+      }
+
+      const response: ServerResponse = {
+        message: "user",
+        success: true,
+      };
+      res.send(response);
+    } catch (err) {
+      if (err instanceof ZodError) {
+        res.send({ message: err.issues[0].message, success: false });
+      } else {
+        res.send({ message: "une erreur innatendue est survenue", success: false });
+      }
+    }
+  };
+
   static login = async (req: Request, res: Response<ServerResponse>) => {
     const { username, password } = req.body;
 
@@ -105,6 +154,8 @@ export class AccountController {
   private static handleAdminLogin(admin: AdminAccount, res: Response<ServerResponse>) {
     const cookie = CookieManager.generate_cookie_with_token(res, {
       admin: true,
+      modo: false,
+      user: false,
       user_id: admin.id,
       username: admin.username,
     });
@@ -112,14 +163,14 @@ export class AccountController {
     if (!cookie) {
       return res.send({ message: "une erreur innatendue est survenue", success: false });
     }
-
-    console.log("[COOKIE] : ", cookie);
     return res.send({ message: "admin", success: true });
   }
 
   private static handleUserLogin(user: Account, res: Response<ServerResponse>) {
     const cookie = CookieManager.generate_cookie_with_token(res, {
       admin: false,
+      user: false,
+      modo: user.is_modo ? true : false,
       user_id: user.id,
       username: user.username,
     });
@@ -127,7 +178,6 @@ export class AccountController {
     if (!cookie) {
       return res.send({ message: "une erreur innatendue est survenue", success: false });
     }
-    console.log("[COOKIE] : ", cookie);
     return res.send({ message: "connect as user", success: true });
   }
 }
