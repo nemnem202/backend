@@ -1,4 +1,5 @@
 export type TableName =
+  | "invitation_key"
   | "category"
   | "account"
   | "administrator"
