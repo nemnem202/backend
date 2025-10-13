@@ -106,4 +106,35 @@ export default abstract class Repository<DTO extends Object, Entity extends obje
       return null;
     }
   };
+
+  update_item = async (entity: DTO & { id: number }): Promise<Entity | null> => {
+    try {
+      const { id, ...fields } = entity;
+
+      const keys = Object.keys(fields);
+      const values = Object.values(fields);
+
+      if (keys.length === 0) {
+        throw new Error("Aucun champ à mettre à jour");
+      }
+
+      const set_clause = keys.map((key, i) => `${key} = $${i + 1}`).join(", ");
+
+      const query = {
+        text: `UPDATE ${this.tableName}
+               SET ${set_clause}
+               WHERE id = $${keys.length + 1}
+               RETURNING *`,
+        values: [...values, id],
+      };
+
+      const result = await this.pool.query<Entity>(query);
+
+      if (result.rows.length === 0) return null;
+      return this.fromRow(result.rows[0]);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour :", error);
+      return null;
+    }
+  };
 }

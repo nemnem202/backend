@@ -9,6 +9,6 @@ const router = Router();
 router.use("/market", market);
 router.use("/product", product);
 router.use("/account", account);
-router.use("invite_key", invite_key);
+router.use("/invite_key", invite_key);
 
 export default router;

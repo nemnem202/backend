@@ -1,0 +1,18 @@
+[
+  {
+    "username": "admin",
+    "password": "admin_password_hash"
+  },
+  {
+    "username": "modo",
+    "password": "modo_password"
+  },
+  {
+    "username": "user",
+    "password": "user_password"
+  },
+  {
+    "username": "vendor",
+    "password": "vendor_password"
+  }
+]
