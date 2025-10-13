@@ -1,9 +1,5 @@
 import { Router } from "express";
 import { MarketController } from "../../controllers/market_controller";
-import uploadMiddleWare from "../../middleware/multer-config";
-
-const market = Router();
-
 import AuthMiddleWare from "../../lib/middlewares/auth";
 
 market.get("", (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next));
