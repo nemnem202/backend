@@ -4,6 +4,7 @@ import { Product, ProductDTO } from "../types/tables/product";
 import { ZodSchema } from "../lib/zod_schemas";
 import { ProductRepository } from "../repository/product";
 import { ZodError } from "zod";
+import { CloudinaryClient } from "../lib/CloudinaryClient";
 
 
 export class MarketController {
@@ -23,30 +24,39 @@ export class MarketController {
 
     try {
       console.log(req.body);
-      const postedProduct: ProductDTO = {
-        account_id: req.body.account_id,
-        available_quantity: req.body.available_quantity,
-        number_of_reports: 0,
-        number_of_sells: 0,
-        product_description: req.body.product_description,
-        product_image_path: req.body.product_image_path,
-        product_name: req.body.product_name,
-        product_price: parseInt(req.body.product_price),
-        suspended: false,
+      const productImage = req.file;
+
+      if (!productImage) {
+        res.status(400)
+        console.log('Aucune image transmise, abandon')
       }
-      console.log(postedProduct)
-      console.log(req.file);
-      const validation = ZodSchema.product.parse(postedProduct)
-      //const product = await this.productRepository.add_item(postedProduct)
-      res.status(200);
-    } 
-    catch(result){
-      if(result instanceof ZodError){
+      else {
+        const postedProduct: ProductDTO = {
+          account_id: 1, //Habituellement : req.body.account_id
+          available_quantity: parseInt(req.body.available_quantity),
+          number_of_reports: 0,
+          number_of_sells: 0,
+          product_description: req.body.product_description,
+          product_image_path: productImage.path,
+          product_name: req.body.product_name,
+          product_price: parseInt(req.body.product_price),
+          suspended: false,
+        }
+        console.log(postedProduct)
+        const validation = ZodSchema.product.parse(postedProduct)
+        const product = await this.productRepository.add_item(postedProduct)
+        console.log(`Product : ${product?.product_name}`)
+        res.status(200);
+      }
+
+    }
+    catch (result) {
+      if (result instanceof ZodError) {
         result.issues.forEach((issue) => {
           console.error(issue);
         })
       }
-      else{
+      else {
         console.error(result);
       }
       res.status(400);
