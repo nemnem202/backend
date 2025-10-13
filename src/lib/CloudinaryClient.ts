@@ -1,6 +1,4 @@
 import { v2 as cloudinary, UploadApiOptions } from "cloudinary";
-import { UploadApiResponse, UploadApiErrorResponse } from "cloudinary";
-import streamifier from "streamifier"
 import dotenv from "dotenv";
 
 export class CloudinaryClient {
@@ -23,31 +21,22 @@ export class CloudinaryClient {
     return CloudinaryClient.instance;
   }
 
-  public async upload_img(
-    buffer: Buffer
-  ): Promise<UploadApiResponse | UploadApiErrorResponse | string | any> {
-    try {
-      console.log('Envoi de l image sur le cloud')
-      const result = await new Promise<UploadApiResponse | UploadApiErrorResponse | string>(
-        (resolve) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            {
-              folder: "uploads",
-              transformation: [{ width: 300, height: 300, crop: "fill" }],
-            },
-            (error, result) => {
-              if (error) return resolve(error);
-              if (!result) return resolve("Unexpected error, no result");
-              resolve(result);
-            }
-          );
+  public uploadImage = async (imagePath: string) => {
+    // Use the uploaded file's name as the asset's public ID and
+    // allow overwriting the asset with new versions
+    const options: UploadApiOptions = {
+      use_filename: false,
+      unique_filename: false,
+      overwrite: true,
+    };
 
-          streamifier.createReadStream(buffer).pipe(uploadStream);
-        }
-      );
-      return result;
-    } catch (err) {
-      return err;
+    try {
+      // Upload the image
+      const result = await cloudinary.uploader.upload(imagePath, options);
+      console.log(result);
+      return result.public_id;
+    } catch (error) {
+      console.error("[CLOUDINARY ERROR ] : ", error);
     }
-  }
+  };
 }
