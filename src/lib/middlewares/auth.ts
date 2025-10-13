@@ -45,4 +45,18 @@ export default class AuthMiddleWare {
       return res.send(response);
     }
   };
+
+  static protect_vendor_route = async (req: Request, res: Response, next: NextFunction) => {
+    const session_token = CookieManager.parse(req);
+    if (session_token && session_token.vendor) {
+      return next();
+    } else {
+      const response: ServerResponse = {
+        message: "no session",
+        success: false,
+        user: false,
+      };
+      return res.send(response);
+    }
+  };
 }

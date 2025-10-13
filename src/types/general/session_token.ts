@@ -4,4 +4,5 @@ export type SessionToken = {
   admin: boolean;
   user: boolean;
   modo: boolean;
+  vendor: boolean;
 };
