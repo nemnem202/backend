@@ -29,6 +29,28 @@ export default abstract class Repository<DTO extends Object, Entity extends obje
     }
   };
 
+  finOneBy = async (prop: keyof Entity, value: any): Promise<Entity | null> => {
+    const columnName = String(prop);
+
+    const query = {
+      text: `SELECT * FROM ${this.tableName} WHERE ${columnName} = $1 LIMIT 1`,
+      values: [value],
+    };
+
+    try {
+      const result = await this.pool.query<Entity>(query);
+
+      if (result.rows.length === 0) {
+        return null;
+      }
+
+      return this.fromRow(result.rows[0]);
+    } catch (error) {
+      console.error(`Erreur dans findOneBy pour ${columnName}:`, error);
+      return null;
+    }
+  };
+
   add_item = async (item: DTO): Promise<Entity | null> => {
     try {
       const keys = Object.keys(item);
