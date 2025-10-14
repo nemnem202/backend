@@ -1,6 +1,6 @@
 import { v2 as cloudinary, UploadApiOptions } from "cloudinary";
 import { UploadApiResponse, UploadApiErrorResponse } from "cloudinary";
-import streamifier from "streamifier"
+import streamifier from "streamifier";
 import dotenv from "dotenv";
 
 export class CloudinaryClient {
@@ -27,7 +27,7 @@ export class CloudinaryClient {
     buffer: Buffer
   ): Promise<UploadApiResponse | UploadApiErrorResponse | string | any> {
     try {
-      console.log('Envoi de l image sur le cloud')
+      console.log("Envoi de l image sur le cloud");
       const result = await new Promise<UploadApiResponse | UploadApiErrorResponse | string>(
         (resolve) => {
           const uploadStream = cloudinary.uploader.upload_stream(
