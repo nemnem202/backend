@@ -8,14 +8,20 @@ import { AccountRepository } from "../repository/account";
 import { ZodError } from "zod";
 import { ZodSchema } from "../lib/zod_schemas";
 import { PasswordHandler } from "../lib/password_handler";
+import InvitationKeyRepository from "../repository/Invitation_key";
+import { InvitationKeyDTO } from "../types/tables/invitation_key";
 
 dotenv.config();
 
 export class AccountController {
   private static adminrepo = new AdminAccountRepository();
   private static userRepo = new AccountRepository();
+  private static invite_key_repo = new InvitationKeyRepository();
 
-  static register = async (req: Request, res: Response<ServerResponse>) => {
+  static register = async (
+    req: Request,
+    res: Response<ServerResponse>
+  ): Promise<Response<ServerResponse>> => {
     try {
       const { username, password, invite_key } = req.body;
 
@@ -26,6 +32,15 @@ export class AccountController {
           message: "l'utilisateur est déja enregistré",
           success: false,
         });
+
+      const existing_invite_key = await this.invite_key_repo.finOneBy("code", invite_key);
+
+      if (!existing_invite_key) {
+        return res.send({ message: "inexistant invite key !", success: false });
+      }
+      if (existing_invite_key.relate_to_user_with_id) {
+        return res.send({ message: "invite key already allocated !", success: false });
+      }
 
       ZodSchema.user.parse({ username, password });
 
@@ -44,9 +59,21 @@ export class AccountController {
         suspended: false,
       };
 
-      const set_user = this.userRepo.add_item(new_user);
+      const set_user = await this.userRepo.add_item(new_user);
 
       if (!set_user) {
+        throw new Error();
+      }
+
+      const invite_key_dto: InvitationKeyDTO = {
+        code: existing_invite_key.code,
+        created_by_modo_with_id: existing_invite_key.created_by_modo_with_id,
+        relate_to_user_with_id: set_user.id,
+      };
+
+      const update = await this.invite_key_repo.update_item(invite_key_dto, existing_invite_key.id);
+
+      if (!update) {
         throw new Error();
       }
 
@@ -54,12 +81,12 @@ export class AccountController {
         message: "user",
         success: true,
       };
-      res.send(response);
+      return res.send(response);
     } catch (err) {
       if (err instanceof ZodError) {
-        res.send({ message: err.issues[0].message, success: false });
+        return res.send({ message: err.issues[0].message, success: false });
       } else {
-        res.send({ message: "une erreur innatendue est survenue", success: false });
+        return res.send({ message: "une erreur innatendue est survenue", success: false });
       }
     }
   };
