@@ -16,10 +16,6 @@ product.get(
   (req, res) => ProductController.get_by_id(req, res)
 );
 
-product.post(
-  "",
-  (req, res, next) => AuthMiddleWare.protect_vendor_route(req, res, next),
-  (req, res) => ProductController.post_product(req, res)
-);
+
 
 export default product;
