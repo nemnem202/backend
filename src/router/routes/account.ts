@@ -16,10 +16,6 @@ account.get(
   (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next),
   (req, res) => AccountController.get_account_infos(req, res)
 );
-account.get(
-  "/session",
-  (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next),
-  (req, res) => AccountController.get_session_infos(req, res)
-);
+account.get("/session", (req, res) => AccountController.get_session_infos(req, res));
 
 export default account;
