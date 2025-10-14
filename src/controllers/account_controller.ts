@@ -153,6 +153,7 @@ export class AccountController {
 
   private static handleAdminLogin(admin: AdminAccount, res: Response<ServerResponse>) {
     const cookie = CookieManager.generate_cookie_with_token(res, {
+      vendor: false,
       admin: true,
       modo: false,
       user: false,
@@ -167,7 +168,9 @@ export class AccountController {
   }
 
   private static handleUserLogin(user: Account, res: Response<ServerResponse>) {
+    console.log("[login as user] :", user);
     const cookie = CookieManager.generate_cookie_with_token(res, {
+      vendor: false,
       admin: false,
       user: false,
       modo: user.is_modo ? true : false,
@@ -178,6 +181,9 @@ export class AccountController {
     if (!cookie) {
       return res.send({ message: "une erreur innatendue est survenue", success: false });
     }
-    return res.send({ message: "connect as user", success: true });
+    return res.send({
+      message: user.is_modo ? "modo" : user.is_vendor ? "vendor" : "user",
+      success: true,
+    });
   }
 }
