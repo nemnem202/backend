@@ -30,7 +30,7 @@ market.post(
 market.post(
   "",
   (req, res, next) => AuthMiddleWare.protect_vendor_route(req, res, next),
-  (req, res, next) => uploadMiddleWare.single("productImage"),
+  (req, res, next) => uploadImage.single("productImage"),
   (req, res) => MarketController.createProduct(req, res)
 );
 
