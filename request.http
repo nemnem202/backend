@@ -1,5 +1,5 @@
 ### tests pour la route account
-GET http://localhost:3000/account/account
+POST http://localhost:3000/market/basket
 
 
 ### tests pour la route product
