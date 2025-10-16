@@ -35,7 +35,7 @@ market.post(
 );
 
 market.post(
-  "/basket", (req, res) => res.send("coucou")
-)
+  "/basket", (req, res) => MarketController.postBasket(req, res)
+);
 
 export default market;
