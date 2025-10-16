@@ -23,14 +23,14 @@ export class MarketController {
   }
 
   static async createProduct(req: Request, res: Response<ServerResponse>) {
-      const uploadedFile = req.file;
-      console.log(`File : ${req.file}`)
-      if (!uploadedFile) {
-        console.log('Aucune image uploadée, abandon')
-        res.status(501);
-      }
-      else {
-        try{
+    const uploadedFile = req.file;
+    console.log(`File : ${req.file}`)
+    if (!uploadedFile) {
+      console.log('Aucune image uploadée, abandon')
+      res.status(501);
+    }
+    else {
+      try {
         const cloudinaryClient = CloudinaryClient.getInstance();
         const uploadedImageLink = await cloudinaryClient.upload_img(uploadedFile.buffer)
         const postedProduct: ProductDTO = {
@@ -48,7 +48,7 @@ export class MarketController {
         const validation = ZodSchema.product.parse(postedProduct)
         const product = await this.productRepository.add_item(postedProduct)
       }
-    catch (result) {
+      catch (result) {
         if (result instanceof ZodError) {
           result.issues.forEach((issue) => {
             console.error(issue);
@@ -59,6 +59,11 @@ export class MarketController {
         }
       }
     }
+  }
+
+  static async postBasket(req: Request, res: Response<ServerResponse>) {
+    const item = req.body;
+    console.log(item);
   }
 }
 
