@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ServerResponse } from "../types/general/server_response";
-import { ProductDTO } from "../types/tables/product";
+import { ProductDTO, Product } from "../types/tables/product";
 import { ZodSchema } from "../lib/zod_schemas";
 import { ProductRepository } from "../repository/product";
 import { ZodError } from "zod";
@@ -12,14 +12,36 @@ import uploadImage from "../lib/middlewares/config-multer";
 export class MarketController {
   static productRepository = new ProductRepository();
 
-  static find(req: Request, res: Response<ServerResponse>) {
-    const response: ServerResponse = {
-      message: "market !",
-      success: true,
-    };
+  static async find(req: Request, res: Response<ServerResponse | Product>) {
+    const productId = req.params.id;
+    const product = await this.productRepository.finOneBy("id", productId);
 
+    if (!product) {
+      const response: ServerResponse = {
+        message: "Product not found!",
+        success: false,
+      };
+      res.send(response);
+      return
+    }
 
-    res.send(response);
+    res.send(product);
+  }
+
+  static async findAll(req: Request, res: Response<ServerResponse | Product[]>) {
+
+    const products = await this.productRepository.findAll();
+
+    if (!products) {
+      const response: ServerResponse = {
+        message: "No product found!",
+        success: false,
+      };
+      res.send(response);
+      return
+    }
+
+    res.send(products);
   }
 
   static async createProduct(req: Request, res: Response<ServerResponse>) {

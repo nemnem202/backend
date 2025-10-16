@@ -8,7 +8,13 @@ const market = Router();
 
 market.get(
   "",
-  (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next),
+  // (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next),
+  (req, res) => MarketController.findAll(req, res)
+);
+
+market.get(
+  "/:id",
+  // (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next),
   (req, res) => MarketController.find(req, res)
 );
 
