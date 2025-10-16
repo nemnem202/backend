@@ -76,11 +76,12 @@ CREATE TABLE order_contain_product (
     FOREIGN KEY (order_id) REFERENCES customer_order (id)
 );
 
-CREATE TABLE basket_Contain_product (
-    id INTEGER NOT NULL,
-    id_1 INTEGER NOT NULL,
-    item_quantity INTEGER NOT NULL,
-    PRIMARY KEY (id, id_1),
-    FOREIGN KEY (id) REFERENCES product (id),
-    FOREIGN KEY (id_1) REFERENCES basket (id)
+CREATE TABLE basket_contain_product (
+    basket_id      INTEGER NOT NULL,
+    product_id     INTEGER NOT NULL,
+    item_quantity  INTEGER NOT NULL,
+
+    PRIMARY KEY (basket_id, product_id),
+    FOREIGN KEY (basket_id) REFERENCES basket (id),
+    FOREIGN KEY (product_id) REFERENCES product (id)
 );
