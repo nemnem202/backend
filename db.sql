@@ -5,7 +5,7 @@ CREATE TABLE account (
     suspended BOOLEAN,
     is_modo BOOLEAN,
     username VARCHAR(100) NOT NULL,
-    password VARCHAR(50) NOT NULL,
+    password VARCHAR(500) NOT NULL,
     is_vendor BOOLEAN,
     number_of_reports INTEGER NOT NULL
 );
@@ -50,11 +50,10 @@ CREATE TABLE customer_order (
 );
 
 CREATE TABLE invitation_key (
-    id INTEGER,
+    id SERIAL PRIMARY KEY,
     code VARCHAR(200) NOT NULL,
     relate_to_user_with_id INTEGER UNIQUE,
     created_by_modo_with_id INTEGER NOT NULL,
-    PRIMARY KEY (id),
     UNIQUE (code),
     FOREIGN KEY (relate_to_user_with_id) REFERENCES account (id),
     FOREIGN KEY (created_by_modo_with_id) REFERENCES account (id)

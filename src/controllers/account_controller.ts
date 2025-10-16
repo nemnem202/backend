@@ -168,11 +168,10 @@ export class AccountController {
   static get_session_infos = (req: Request, res: Response<ServerResponse>) => {
     const userInfos = CookieManager.parse(req);
 
-    console.log("[USER INFOS]", userInfos);
-
     if (!userInfos) return res.send({ message: "could not get session", success: false });
 
     if ("username" in userInfos && "user_id" in userInfos && "admin" in userInfos) {
+      console.log("session valide pour ", userInfos.admin ? "admin" : "user");
       return res.send({ message: userInfos.admin ? "admin" : "user", success: true });
     } else {
       return res.send({ message: "invalid data", success: false });
@@ -198,9 +197,9 @@ export class AccountController {
   private static handleUserLogin(user: Account, res: Response<ServerResponse>) {
     console.log("[login as user] :", user);
     const cookie = CookieManager.generate_cookie_with_token(res, {
-      vendor: false,
+      vendor: user.is_vendor ? true : false,
       admin: false,
-      user: false,
+      user: true,
       modo: user.is_modo ? true : false,
       user_id: user.id,
       username: user.username,
@@ -209,6 +208,8 @@ export class AccountController {
     if (!cookie) {
       return res.send({ message: "une erreur innatendue est survenue", success: false });
     }
+
+    console.log("api response: ", user.is_modo ? "modo" : user.is_vendor ? "vendor" : "user");
     return res.send({
       message: user.is_modo ? "modo" : user.is_vendor ? "vendor" : "user",
       success: true,
