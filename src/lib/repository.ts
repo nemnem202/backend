@@ -29,6 +29,24 @@ export default abstract class Repository<DTO extends Object, Entity extends obje
     }
   };
 
+  findAllWhere = async (prop: keyof Entity, value: any): Promise<Entity[] | null> => {
+    const columnName = String(prop);
+    const query = {
+      text: `SELECT * FROM ${this.tableName} WHERE ${columnName} = $1`,
+      values: [value],
+    };
+    try {
+      const result = await this.pool.query(query);
+      const data = result.rows.map(this.fromRow);
+
+      return data;
+    } catch (error) {
+      console.error(error);
+
+      return null;
+    }
+  };
+
   finOneBy = async (prop: keyof Entity, value: any): Promise<Entity | null> => {
     const columnName = String(prop);
 

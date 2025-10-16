@@ -10,6 +10,7 @@ import { ZodSchema } from "../lib/zod_schemas";
 import { PasswordHandler } from "../lib/password_handler";
 import InvitationKeyRepository from "../repository/Invitation_key";
 import { InvitationKeyDTO } from "../types/tables/invitation_key";
+import { is_valid_session_name } from "../types/general/session_names";
 
 dotenv.config();
 
@@ -212,5 +213,66 @@ export class AccountController {
       message: user.is_modo ? "modo" : user.is_vendor ? "vendor" : "user",
       success: true,
     });
+  }
+
+  static async getAllAccountsOfSameType(
+    req: Request,
+    res: Response<{ accounts: Account[] }>
+  ): Promise<Response<{ accounts: Account[] }>> {
+    try {
+      const type = req.params.type;
+
+      console.log("[GET ALL ACCOUNTS OF SAME TYPE] :", type);
+
+      if (is_valid_session_name(type)) {
+        console.log(type + " IS A VALID SESSION NAME");
+        let accounts: Account[] | null = null;
+        switch (type) {
+          case "modo":
+            accounts = await this.userRepo.findAllWhere("is_modo", true);
+            break;
+          case "vendor":
+            accounts = await this.userRepo.findAllWhere("is_vendor", true);
+            break;
+          case "user":
+            accounts = await this.userRepo.findAllWhere("is_modo", false);
+            break;
+        }
+        console.log("ACCOUNTS FOUNDED:", accounts);
+        return res.send({ accounts: accounts ?? [] });
+      } else {
+        return res.send({ accounts: [] });
+      }
+    } catch {
+      return res.send({ accounts: [] });
+    }
+  }
+  static async change_suspend_status(
+    req: Request,
+    res: Response<ServerResponse>
+  ): Promise<Response<ServerResponse>> {
+    try {
+      const { suspended } = req.body;
+      const id = parseInt(req.params.id);
+
+      const user = await this.userRepo.finOneBy("id", id);
+
+      if (!user) {
+        throw new Error();
+      }
+      user.suspended = suspended;
+      const update = await this.userRepo.update_item(user, id);
+
+      if (!update) {
+        throw new Error();
+      }
+      return res.send({
+        message: `user with id: ${id} is now with suspended: ${suspended}`,
+        success: true,
+      });
+    } catch (error) {
+      console.error(req.body);
+      return res.send({ message: "an error occured in suspend change", success: false });
+    }
   }
 }
