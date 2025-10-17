@@ -29,8 +29,14 @@ account.get(
 
 account.post(
   "/suspend/:id",
-  (req, res, next) => AuthMiddleWare.protect_admin_route(req, res, next),
+  (req, res, next) => AuthMiddleWare.protect_modo_route(req, res, next),
   (req, res) => AccountController.change_suspend_status(req, res)
+);
+
+account.get(
+  "/vendor/:id",
+  (req, res, next) => AuthMiddleWare.protect_modo_route(req, res, next),
+  (req, res) => AccountController.promote_to_vendor(req, res)
 );
 
 export default account;

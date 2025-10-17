@@ -256,7 +256,11 @@ export class AccountController {
             accounts = await this.userRepo.findAllWhere("is_vendor", true);
             break;
           case "user":
-            accounts = await this.userRepo.findAllWhere("is_modo", false);
+            accounts = await this.userRepo.findAllWhere("is_modo", false).then((acc) => {
+              if (acc) {
+                return acc.filter((a) => a.is_vendor !== true);
+              } else return null;
+            });
             break;
         }
         return res.send({ accounts: accounts ?? [] });
@@ -267,6 +271,7 @@ export class AccountController {
       return res.send({ accounts: [] });
     }
   }
+
   static async change_suspend_status(
     req: Request,
     res: Response<ServerResponse>
@@ -291,6 +296,33 @@ export class AccountController {
       console.log("[UPDATE] :", update);
       return res.send({
         message: `user with id: ${id} is now with suspended: ${suspended}`,
+        success: true,
+      });
+    } catch (error) {
+      console.error(req.body);
+      return res.send({ message: "an error occured in suspend change", success: false });
+    }
+  }
+
+  static async promote_to_vendor(req: Request, res: Response<ServerResponse>) {
+    try {
+      const id = parseInt(req.params.id);
+
+      const user = await this.userRepo.finOneBy("id", id);
+
+      if (!user) {
+        throw new Error();
+      }
+      user.is_vendor = true;
+      const update = await this.userRepo.update_item(user, id);
+
+      if (!update) {
+        throw new Error();
+      }
+
+      console.log("[UPDATE] :", update);
+      return res.send({
+        message: `user with id: ${id} is now a vendor`,
         success: true,
       });
     } catch (error) {
