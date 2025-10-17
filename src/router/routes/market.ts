@@ -26,12 +26,9 @@ market.get(
   (req, res) => MarketController.createProduct(req, res)
 ); **/
 
-market.post(
-  "/create-product",
-  uploadImage.single('productImage'),
-  (req, res) => MarketController.createProduct(req, res)
+market.post("/create-product", uploadImage.single("productImage"), (req, res) =>
+  MarketController.createProduct(req, res)
 );
-
 
 market.post(
   "",
@@ -40,8 +37,12 @@ market.post(
   (req, res) => MarketController.createProduct(req, res)
 );
 
-market.post(
-  "/basket", (req, res) => MarketController.postBasket(req, res)
+market.post("/basket", (req, res) => MarketController.postBasket(req, res));
+
+market.get(
+  "/basket",
+  (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next),
+  (req, res) => MarketController.getBasket(req, res)
 );
 
 export default market;
