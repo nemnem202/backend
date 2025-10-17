@@ -11,6 +11,7 @@ import { PasswordHandler } from "../lib/password_handler";
 import InvitationKeyRepository from "../repository/Invitation_key";
 import { InvitationKeyDTO } from "../types/tables/invitation_key";
 import { is_valid_session_name } from "../types/general/session_names";
+import { SessionToken } from "../types/general/session_token";
 
 dotenv.config();
 
@@ -151,10 +152,29 @@ export class AccountController {
 
     const user = await this.userRepo.finOneBy("username", username);
 
-    if (user && (await PasswordHandler.chech_validity(password, user.password)) === true)
+    if (
+      user &&
+      (await PasswordHandler.chech_validity(password, user.password)) === true &&
+      !user.suspended
+    ) {
       return AccountController.handleUserLogin(user, res);
+    } else if (user && user.suspended) {
+      return res.send({ message: "accout suspended", success: false });
+    }
 
     res.send({ message: "invalid username or password", success: false });
+  };
+
+  static disconnect = async (req: Request, res: Response<ServerResponse>) => {
+    res.cookie("session_token", "", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      expires: new Date(0),
+    });
+
+    res.send({ message: "disconnected !", success: true });
   };
 
   static get_account_infos = (req: Request, res: Response<ServerResponse | Account>) => {
@@ -239,7 +259,6 @@ export class AccountController {
             accounts = await this.userRepo.findAllWhere("is_modo", false);
             break;
         }
-        console.log("ACCOUNTS FOUNDED:", accounts);
         return res.send({ accounts: accounts ?? [] });
       } else {
         return res.send({ accounts: [] });
@@ -252,6 +271,7 @@ export class AccountController {
     req: Request,
     res: Response<ServerResponse>
   ): Promise<Response<ServerResponse>> {
+    console.log("[SUSPEND ?]");
     try {
       const { suspended } = req.body;
       const id = parseInt(req.params.id);
@@ -267,6 +287,8 @@ export class AccountController {
       if (!update) {
         throw new Error();
       }
+
+      console.log("[UPDATE] :", update);
       return res.send({
         message: `user with id: ${id} is now with suspended: ${suspended}`,
         success: true,

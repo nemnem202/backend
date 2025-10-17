@@ -12,6 +12,8 @@ account.post(
 );
 account.post("/login", (req, res) => AccountController.login(req, res));
 
+account.get("/disconnect", (req, res) => AccountController.disconnect(req, res));
+
 account.get(
   "/account",
   (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next),
@@ -21,7 +23,7 @@ account.get("/session", (req, res) => AccountController.get_session_infos(req, r
 
 account.get(
   "/all/:type",
-  (req, res, next) => AuthMiddleWare.protect_admin_route(req, res, next),
+  (req, res, next) => AuthMiddleWare.protect_modo_route(req, res, next),
   (req, res) => AccountController.getAllAccountsOfSameType(req, res)
 );
 
