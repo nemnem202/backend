@@ -40,6 +40,12 @@ market.post(
 );
 
 market.get(
+  "/category/:category",
+  // (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next),
+  (req, res) => MarketController.findAllByCategory(req, res)
+);
+
+market.get(
   "/:id",
   // (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next),
   (req, res) => MarketController.find(req, res)

@@ -45,6 +45,24 @@ export class MarketController {
     res.send(products);
   }
 
+  static async findAllByCategory(req: Request, res: Response<ServerResponse | Product[]>) {
+    const category = req.params.category;
+    console.log("Catégorie : ", category);
+
+    const products = await this.productRepository.findAllByCategory(category);
+
+    if (!products) {
+      const response: ServerResponse = {
+        message: "No product found!",
+        success: false,
+      };
+      res.send(response);
+      return;
+    }
+
+    res.send(products);
+  }
+
   static async createProduct(req: Request, res: Response<ServerResponse>) {
     const uploadedFile = req.file;
     console.log(`File : ${req.file}`);
