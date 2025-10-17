@@ -82,17 +82,35 @@ export class MarketController {
   }
 
   static async postBasket(req: Request, res: Response<ServerResponse>) {
-    const { product } = req.body;
+    const { id, quantity } = req.body;
 
-    console.log(product);
+    const user = CookieManager.parse(req);
+
+    if (!user || !user.user_id) {
+      return res.send({ message: "invalid session, try to login again", success: false });
+    }
+
+    if (!id || !quantity)
+      return res.send({ message: "invalid product or quantity", success: false });
+
+    this.basketRepository.add_item({
+      item_quantity: quantity,
+      product_id: id,
+      user_id: user.user_id,
+    });
+
+    res.send({ message: "successfully added to basket !", success: true });
   }
 
   static async getBasket(req: Request, res: Response<ServerResponse | Product[]>) {
+    console.log("[GET BASKET]");
     const userInfos = CookieManager.parse(req);
 
     if (!userInfos || !userInfos.user) {
       return res.send({ message: "invalid session", success: false });
     }
+
+    console.log(userInfos);
 
     const relations = await this.basketRepository.findAllWhere("user_id", userInfos.user_id);
 

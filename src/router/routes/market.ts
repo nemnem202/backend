@@ -12,10 +12,12 @@ market.get(
   (req, res) => MarketController.findAll(req, res)
 );
 
+market.post("/basket", (req, res) => MarketController.postBasket(req, res));
+
 market.get(
-  "/:id",
-  // (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next),
-  (req, res) => MarketController.find(req, res)
+  "/basket",
+  (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next),
+  (req, res) => MarketController.getBasket(req, res)
 );
 
 /** Think to reanable this route and delete the next one */
@@ -37,12 +39,10 @@ market.post(
   (req, res) => MarketController.createProduct(req, res)
 );
 
-market.post("/basket", (req, res) => MarketController.postBasket(req, res));
-
 market.get(
-  "/basket",
-  (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next),
-  (req, res) => MarketController.getBasket(req, res)
+  "/:id",
+  // (req, res, next) => AuthMiddleWare.protect_user_route(req, res, next),
+  (req, res) => MarketController.find(req, res)
 );
 
 export default market;
