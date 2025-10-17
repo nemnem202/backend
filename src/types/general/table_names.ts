@@ -6,4 +6,5 @@ export type TableName =
   | "customer_order"
   | "order_contain_product"
   | "product"
-  | "product_belong_category";
+  | "product_belong_category"
+  | "basket_contain_product";
