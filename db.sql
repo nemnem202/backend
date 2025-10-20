@@ -1,3 +1,4 @@
+-- Active: 1757667525610@@127.0.0.1@5432@legalwebsite
 SELECT current_database(), current_user;
 
 CREATE TABLE account (
